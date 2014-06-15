@@ -1,121 +1,20 @@
-`r opts_echo=TRUE`
-Assignement One Rmd
-==========================
-Part 1  Loading and preprocessing the data
-------------------------------------------
-#### Question 1: Load the data 
-```{r simulation, echo=TRUE}
-#loading data
-data <- read.csv("activity.csv")
-data$date <- as.Date(data$date)
-```
-#### Question 2: Process/transform the data (if necessary) into a format suitable for your analysis
-```{r}
-#get rid of na data for the drist part
-dataNoNa <- na.omit(data)
-```
-______________________________________________________________________
-Part 2 What is mean total number of steps taken per day?
---------------------------------------------------------
-#### Question 1: Make a histogram of the total number of steps taken each day
-```{r}
-numOfSteps <- tapply(dataNoNa$steps, dataNoNa$date, sum)
-hist(numOfSteps)
-```
-
-#### Question 2: Calculate and report the mean and median total number of steps taken per day 
-```{r}
-mn <- mean(tapply(dataNoNa$steps, dataNoNa$date, sum))
-md <- median(tapply(dataNoNa$steps, dataNoNa$date, sum))
-```
-
-The mean number of steps is  `r mn` per day  
-The median number of steps is `r md` per day  
-  
-_______________________________________________________________
-    
-Part 3 What is the average daily activity pattern?
---------------------------------------------------
-#### Question 1: Make a time series plot  
-```{r}
-plot(tapply(dataNoNa$steps, dataNoNa$date, mean), type="l")
-```
-
-#### Qustion 2: Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r}
-mostSteps <- dataNoNa[dataNoNa$steps == max(dataNoNa$steps),,]
-```
-
-The most steps in any one interval is `r mostSteps[3]` with `r mostSteps[1]` steps on `r mostSteps[2]`.  
-_______________________________
-
-Part 4 Imputing missing values
--------------------------------------------------------
-#### Question 1: Calculate and report the total number of missing values in the dataset
-```{r}
-naCount <- dim(data)[1] - dim(dataNoNa)[1]
-```
-There are `r naCount` missing values in the source data.  
-
-#### Question 2: Devise a strategy for filling in all of the missing values in the dataset. 
-I decided to go with the average value across the entire dataset rounded down.  
-
-#### Question 3: Create a new dataset that is equal to the original dataset but with the missing data filled in.
-```{r}
-#First i need to caculate the daily step averages
-stepDayAve <- round(ave(dataNoNa$steps)[1])
-```
-this value is `r stepDayAve`.  
-```{r}
-#Now I have to merge these values into the orginal dataset replacing the NA values
-t <- replace (data$steps, is.na(data$steps), stepDayAve)
-
-#create a copy of the orginal dataset and make the changes to the step counts.
-data2 <- data
-data2$steps <- t
-```
+# Reproducible Research: Peer Assessment 1
 
 
-#### Question 4: Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
-```{r}
-#plot the histagram
-numberOfSteps <- tapply(data2$steps, data2$date, sum)
-hist(numberOfSteps)
-```
+## Loading and preprocessing the data
 
 
-```{r}
-mean(tapply(data2$steps, data2$date, sum))
 
-median(tapply(data2$steps, data2$date, sum))
-
-```
-
-The numbers above are slight lower the then nubmers found in Part one of this assignment. There are more points to be used when caculating the averages which is why the numbers are slightly lower.  
+## What is mean total number of steps taken per day?
 
 
-___________________________________________
-Part 5 Are there differences in activity patterns between weekdays and weekends?
-------------------------------------------
-#### Question 1: Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
-```{r}
-library("data.table")
-myfun <- function(x)
-{
-  temp <- weekdays(x)
-  ifelse( temp %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"),
-    list("weekday"),list("weekend"))
-}
 
-#add the name of the week to the data table.
-finalTable <- data.table(data)
-finalTable[,c("dayOfWeek") := myfun(finalTable$date)]
-```
+## What is the average daily activity pattern?
 
-#### Question 2: Make a panel plot containing a time series plot
------------------------------------------------------------------
-```{r}
-library("lattice")
-filter <- c("weekday", "weekend")
-xyplot(finalTable$steps ~ finalTable$interval| filter ,layout(c(2,1)), type="l")
-```
+
+
+## Imputing missing values
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
